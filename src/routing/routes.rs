@@ -10,14 +10,14 @@ impl Route {
         return match &route_str[..] {
             "/" => Ok(Route::Root),
             "/sleep" => Ok(Route::Sleep),
-            _ => Err(RouteDoesNotExistError)
-        }
+            _ => Err(RouteDoesNotExistError),
+        };
     }
 
     pub fn to_string(&self) -> String {
         return match &self {
             Route::Root => "/".to_string(),
-            Route::Sleep => "/sleep".to_string()
-        }
+            Route::Sleep => "/sleep".to_string(),
+        };
     }
 }

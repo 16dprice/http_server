@@ -1,7 +1,17 @@
-use std::{
-    fs, io::{BufReader, prelude::*}, net::{TcpListener, TcpStream}, thread::{self, sleep}, time::Duration,
+use http_server::{
+    ThreadPool,
+    routing::{
+        route_parser::{HTTPMethod, parse_request_line},
+        routes::Route,
+    },
 };
-use http_server::{ThreadPool, routing::{route_parser::{HTTPMethod, parse_request_line}, routes::Route}};
+use std::{
+    fs,
+    io::{BufReader, prelude::*},
+    net::{TcpListener, TcpStream},
+    thread::{self, sleep},
+    time::Duration,
+};
 
 const PORT: usize = 7878;
 
@@ -38,17 +48,15 @@ fn handle_connection(mut stream: TcpStream) {
                     thread::sleep(Duration::from_secs(5));
                     ("HTTP/1.1 200 OK", "templates/hello.html")
                 }
-            }
-            _ => { not_found_return_val }
-        }
+            },
+            _ => not_found_return_val,
+        },
     };
 
     let contents = fs::read_to_string(filename).unwrap();
     let length = contents.len();
-    
-    let response = format!(
-        "{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}"
-    );
+
+    let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
 
     stream.write_all(response.as_bytes()).unwrap();
 }
