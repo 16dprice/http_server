@@ -1,0 +1,61 @@
+use core::{error, fmt};
+use crate::{basic_error, routing::routes::Route};
+
+#[derive(Debug, Clone)]
+struct ParseError;
+basic_error!(ParseError, "parse error occurred");
+
+#[derive(Debug, Clone)]
+struct UnsupportedMethodError;
+basic_error!(UnsupportedMethodError, "unsupported method error occurred");
+
+pub enum HTTPMethod {
+    GET, POST, PUT, PATCH, DELETE
+}
+
+enum HTTPVersion {
+    HTTP1dot1
+}
+
+pub struct RequestLine {
+    pub method: HTTPMethod,
+    pub version: HTTPVersion,
+    pub route: Route,
+}
+
+pub fn parse_request_line(request_line: String) -> Result<RequestLine, Box<dyn error::Error>> {
+    let parts: Vec<&str> = request_line.split(' ').collect();
+
+    if parts.len() != 3 {
+        return Err(ParseError.into());
+    }
+
+    let method;
+    match parts[0] {
+        "GET" => { method = HTTPMethod::GET },
+        "PUT" => { method = HTTPMethod::PUT },
+        "POST" => { method = HTTPMethod::POST },
+        "PATCH" => { method = HTTPMethod::PATCH },
+        "DELETE" => { method = HTTPMethod::DELETE },
+        _ => return Err(UnsupportedMethodError.into())
+    }
+
+    let route = Route::from_string(parts[1].to_string());
+    let route = match route {
+        Err(_) => { return Err(ParseError.into()) }
+        Ok(r) => { r }
+    };
+
+    let version = match parts[2] {
+        "HTTP/1.1" => HTTPVersion::HTTP1dot1,
+        _ => { return Err(ParseError.into()) }
+    };
+
+    return Ok(
+        RequestLine {
+            method,
+            route,
+            version,
+        }
+    );
+}
