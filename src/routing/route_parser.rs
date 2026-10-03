@@ -34,8 +34,10 @@ enum HTTPVersion {
 
 pub struct RequestLine {
     pub method: HTTPMethod,
-    pub version: HTTPVersion,
     pub route: Route,
+
+    #[allow(unused)]
+    version: HTTPVersion,
 }
 
 pub fn parse_request_line(request_line: String) -> Result<RequestLine, Box<dyn error::Error>> {
