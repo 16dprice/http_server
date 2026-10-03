@@ -1,17 +1,11 @@
 use http_server::{
     ThreadPool,
-    controllers::{root_controller::root_controller, sleep_controller::sleep_controller},
-    routing::{
-        route_parser::{HTTPMethod, parse_request_line},
-        routes::Route,
-    },
+    routing::route_parser::{HTTPMethod, parse_request_line},
 };
 use std::{
     fs,
     io::{BufReader, prelude::*},
     net::{TcpListener, TcpStream},
-    thread::{self, sleep},
-    time::Duration,
 };
 
 const PORT: usize = 7878;
@@ -43,16 +37,11 @@ fn handle_connection(mut stream: TcpStream) {
     let (status_code, contents) = match request_line {
         Err(_) => not_found_return_val,
         Ok(r) => match r.method {
-            HTTPMethod::GET => match r.route {
-                Route::Root => {
-                    let res = root_controller();
-                    (res.status_code, res.contents)
-                }
-                Route::Sleep => {
-                    let res = sleep_controller();
-                    (res.status_code, res.contents)
-                }
-            },
+            HTTPMethod::GET => {
+                let route_controller = r.route.to_controller();
+                let res = route_controller();
+                (res.status_code, res.contents)
+            }
             _ => not_found_return_val,
         },
     };

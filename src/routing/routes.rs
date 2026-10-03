@@ -1,3 +1,7 @@
+use crate::controllers::{
+    Controller, root_controller::root_controller, sleep_controller::sleep_controller,
+};
+
 pub enum Route {
     Root,
     Sleep,
@@ -18,6 +22,13 @@ impl Route {
         return match &self {
             Route::Root => "/".to_string(),
             Route::Sleep => "/sleep".to_string(),
+        };
+    }
+
+    pub fn to_controller(&self) -> Controller {
+        return match &self {
+            Route::Root => root_controller,
+            Route::Sleep => sleep_controller,
         };
     }
 }
