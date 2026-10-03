@@ -3,9 +3,13 @@ use std::{
 };
 use http_server::{ThreadPool, routing::{route_parser::{HTTPMethod, parse_request_line}, routes::Route}};
 
+const PORT: usize = 7878;
+
 fn main() {
-    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).unwrap();
     let pool = ThreadPool::new(4);
+
+    println!("Server listening on port {}...", PORT);
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
